@@ -33,7 +33,7 @@ Describe "Testing script internals -- it should write host as expected" {
             [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id', 'User'), 'Process')
             [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_client_id', [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_client_id', 'User'), 'Process')
             [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id', 'User'), 'Process')
-            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } } # Note:  TODO ... when I commented this mock out, Invoke-RestMethod got a 401 unauthorized error.  Bummer.
+            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } } # Hooray!  I now get a real "ghs_" token when I comment out the mock, as an error instead of "ghs_faketoken123"
             Mock Write-Host {}
             Remove-Item Env:\TF_BUILD -ErrorAction 'Ignore'
         }

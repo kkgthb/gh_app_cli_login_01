@@ -27,7 +27,7 @@ Describe "Testing script internals -- it should get tokens" {
         }
         
         BeforeEach {
-            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } } # TODO:  still 401s out when mock commented out
+            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } }
         }
 
         It 'calls the correct GitHub API endpoint' {
