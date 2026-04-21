@@ -17,6 +17,15 @@ $m = New-Module -Name 'MyEphemeralModule' -ArgumentList $script:testEnvPath, $sc
 }
 $m | Import-Module -Global -Force
 
+# Evaluated at discovery time so -Skip: works on It blocks below.
+$script:hasLiveEnvVars = [bool](
+    [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_pem',             'User') -and
+    [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id',              'User') -and
+    [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_client_id',       'User') -and
+    [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id', 'User') -and
+    [Environment]::GetEnvironmentVariable('DEMOS_my_gh_org_name',            'User')
+)
+
 Describe "Testing script internals -- it should write host as expected" {
     InModuleScope 'MyEphemeralModule' {
         BeforeAll {
@@ -82,6 +91,54 @@ Describe "Testing script internals -- it should write host as expected" {
                 $result | Should -BeNullOrEmpty
             }
         }
+    }
+}
+
+Describe "Integration -- live GitHub API calls via Set-GitHubToken" -Tag 'Integration' {
+    BeforeAll {
+        [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_pem',             [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_pem',             'User'), 'Process')
+        [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id',              [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id',              'User'), 'Process')
+        [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_client_id',       [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_client_id',       'User'), 'Process')
+        [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id', 'User'), 'Process')
+        [Environment]::SetEnvironmentVariable('DEMOS_my_gh_org_name',            [Environment]::GetEnvironmentVariable('DEMOS_my_gh_org_name',            'User'), 'Process')
+        $script:org = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_org_name')
+        Set-GitHubToken  # real call, no mocks -- sets $env:GITHUB_TOKEN
+    }
+
+    AfterAll {
+        Remove-Item Env:\GITHUB_TOKEN -ErrorAction Ignore
+    }
+
+    It 'gh can read the org login and description' -Skip:(-not $script:hasLiveEnvVars) {
+        $result = gh api "/orgs/$($script:org)" `
+            --header "Authorization: Bearer $env:GITHUB_TOKEN" | ConvertFrom-Json
+        $result.login | Should -Not -BeNullOrEmpty
+    }
+
+    It 'installation reports repository_selection of selected' -Skip:(-not $script:hasLiveEnvVars) {
+        $result = gh api '/installation/repositories' `
+            --header "Authorization: Bearer $env:GITHUB_TOKEN" | ConvertFrom-Json
+        $result.repository_selection | Should -Be 'selected'
+    }
+
+    It 'org members endpoint responds without a 403' -Skip:(-not $script:hasLiveEnvVars) {
+        $null = gh api "/orgs/$($script:org)/members" `
+            --header "Authorization: Bearer $env:GITHUB_TOKEN"
+        $LASTEXITCODE | Should -Be 0
+    }
+
+    It 'org repos endpoint responds without a 403' -Skip:(-not $script:hasLiveEnvVars) {
+        $null = gh api "/orgs/$($script:org)/repos" `
+            --header "Authorization: Bearer $env:GITHUB_TOKEN"
+        $LASTEXITCODE | Should -Be 0
+    }
+
+    It '/user is not accessible to an installation token' -Skip:(-not $script:hasLiveEnvVars) {
+        # gh exits 1 for 4xx; JSON body is still on stdout; stderr suppressed since 403 is expected here
+        $raw = gh api /user `
+            --header "Authorization: Bearer $env:GITHUB_TOKEN" 2>$null
+        $LASTEXITCODE | Should -Be 1
+        ($raw | ConvertFrom-Json).message | Should -Be 'Resource not accessible by integration'
     }
 }
 
