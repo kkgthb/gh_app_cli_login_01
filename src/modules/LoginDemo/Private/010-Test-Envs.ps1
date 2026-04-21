@@ -18,9 +18,9 @@ function Test-Envs {
     ) # end Param
 
     Begin {
-        # Validate DEMOS_my_gh_org_name environment variable
-        $GhOrgName = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_org_name')
-        If (-not $GhOrgName) { Throw 'Required environment variable DEMOS_my_gh_org_name is not set.' }
+        # Validate DEMOS_my_gh_app_pem environment variable
+        $GhAppPem = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_pem')
+        If (-not $GhAppPem) { Throw 'Required environment variable DEMOS_my_gh_app_pem is not set.' }
         # Validate DEMOS_my_gh_app_id environment variable
         $GhAppId = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id')
         If (-not $GhAppId) { Throw 'Required environment variable DEMOS_my_gh_app_id is not set.' }
