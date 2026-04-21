@@ -21,23 +21,17 @@ Describe "Testing script internals -- it should write host as expected" {
     InModuleScope 'MyEphemeralModule' {
         BeforeAll {
             # Snapshot any real env vars so we can restore them after this Describe block
-            $script:OriginalAppId = $env:GH_APP_ID
-            $script:OriginalInstallationId = $env:GH_APP_INSTALLATION_ID
-            $script:OriginalPrivateKey = $env:GH_APP_PRIVATE_KEY
             $script:OriginalTfBuild = $env:TF_BUILD
         }
 
         AfterAll {
-            $env:GH_APP_ID = $script:OriginalAppId
-            $env:GH_APP_INSTALLATION_ID = $script:OriginalInstallationId
-            $env:GH_APP_PRIVATE_KEY = $script:OriginalPrivateKey
             $env:TF_BUILD = $script:OriginalTfBuild
         }
 
         BeforeEach {
-            [Environment]::SetEnvironmentVariable('DEMOS_my_gh_org_name', 'HelloWorldOrg', 'Process')
-            [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', '12345', 'Process')
-            [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', '54321', 'Process')
+            # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_pem', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_pem', 'User'), 'Process')
+            # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', 'User'), 'Process')
+            # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', 'User'), 'Process')
             Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } }
             Mock Write-Host {}
             Remove-Item Env:\TF_BUILD -ErrorAction 'Ignore'

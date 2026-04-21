@@ -3,14 +3,12 @@ function Set-GitHubToken {
     Test-Envs
 
     # Get the token
-    $rsa = [System.Security.Cryptography.RSA]::Create(2048) # TODO:  fix
     $getTokenParams = @{
         AppId          = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id')
         InstallationId = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id')
-        PrivateKeyPem  = $rsa.ExportRSAPrivateKeyPem() # TODO:  fix
+        PrivateKeyPem  = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_pem')
     }
     $token = Get-GitHubAppInstallationToken @getTokenParams
-    $rsa.Dispose() # TODO:  fix
     
     If ([Environment]::GetEnvironmentVariable('TF_BUILD') -eq 'True') {
         # We must be within an Azure Pipelines, because TF_BUILD is set to "True".
