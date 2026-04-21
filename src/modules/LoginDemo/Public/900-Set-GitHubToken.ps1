@@ -5,6 +5,7 @@ function Set-GitHubToken {
     # Get the token
     $getTokenParams = @{
         AppId          = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_id')
+        ClientId       = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_client_id')
         InstallationId = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id')
         PrivateKeyPem  = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_pem')
     }

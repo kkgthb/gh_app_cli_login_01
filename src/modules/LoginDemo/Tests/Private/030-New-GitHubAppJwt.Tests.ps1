@@ -25,29 +25,29 @@ Describe "Testing script internals -- it should create JWTs" {
             $rsa.Dispose()
         }
         It 'returns a three-part dot-delimited string' {
-            $jwt = New-GitHubAppJwt -AppId 'app123' -PrivateKeyPem $script:TestPrivateKeyPem
+            $jwt = New-GitHubAppJwt -ClientId 'app123' -PrivateKeyPem $script:TestPrivateKeyPem
             $parts = $jwt -split '\.'
             $parts.Count | Should -Be 3
         }
         It 'uses RS256 in the header' {
-            $jwt = New-GitHubAppJwt -AppId 'app123' -PrivateKeyPem $script:TestPrivateKeyPem
+            $jwt = New-GitHubAppJwt -ClientId 'app123' -PrivateKeyPem $script:TestPrivateKeyPem
             $header = ConvertFrom-Base64Url (($jwt -split '\.')[0]) | ConvertFrom-Json
             $header.alg | Should -Be 'RS256'
             $header.typ | Should -Be 'JWT'
         }
-        It 'sets iss to the provided AppId' {
-            $jwt = New-GitHubAppJwt -AppId 'my-app-42' -PrivateKeyPem $script:TestPrivateKeyPem
+        It 'sets iss to the provided ClientId' {
+            $jwt = New-GitHubAppJwt -ClientId 'my-app-42' -PrivateKeyPem $script:TestPrivateKeyPem
             $payload = ConvertFrom-Base64Url (($jwt -split '\.')[1]) | ConvertFrom-Json
             $payload.iss | Should -Be 'my-app-42'
         }
         It 'produces a 600-second window between iat and exp' {
             # iat = now-60, exp = now+540 → exp-iat is always 600 regardless of clock
-            $jwt = New-GitHubAppJwt -AppId 'app1' -PrivateKeyPem $script:TestPrivateKeyPem
+            $jwt = New-GitHubAppJwt -ClientId 'app1' -PrivateKeyPem $script:TestPrivateKeyPem
             $payload = ConvertFrom-Base64Url (($jwt -split '\.')[1]) | ConvertFrom-Json
             ($payload.exp - $payload.iat) | Should -Be 600
         }
         It 'produces a non-empty signature segment' {
-            $jwt = New-GitHubAppJwt -AppId 'app1' -PrivateKeyPem $script:TestPrivateKeyPem
+            $jwt = New-GitHubAppJwt -ClientId 'app1' -PrivateKeyPem $script:TestPrivateKeyPem
             ($jwt -split '\.')[2] | Should -Not -BeNullOrEmpty
         }
     }

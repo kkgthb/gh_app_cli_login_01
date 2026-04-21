@@ -1,10 +1,11 @@
 function Get-GitHubAppInstallationToken {
     param(
         [Parameter(Mandatory)] [string] $AppId,
+        [Parameter(Mandatory)] [string] $ClientId,
         [Parameter(Mandatory)] [string] $InstallationId,
         [Parameter(Mandatory)] [string] $PrivateKeyPem
     )
-    $jwt = New-GitHubAppJwt -AppId $AppId -PrivateKeyPem $PrivateKeyPem
+    $jwt = New-GitHubAppJwt -ClientId $ClientId -PrivateKeyPem $PrivateKeyPem
 
     $restMethodParams = @{
         Uri        = "https://api.github.com/app/installations/$InstallationId/access_tokens"

@@ -27,44 +27,44 @@ Describe "Testing script internals -- it should get tokens" {
         }
         
         BeforeEach {
-            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } }
+            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } } # TODO:  still 401s out when mock commented out
         }
 
         It 'calls the correct GitHub API endpoint' {
-            Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+            Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             Should -Invoke Invoke-RestMethod -ParameterFilter {
                 $Uri -eq 'https://api.github.com/app/installations/99/access_tokens'
             }
         }
 
         It 'sends a POST request' {
-            Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+            Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             Should -Invoke Invoke-RestMethod -ParameterFilter { $Method -eq 'Post' }
         }
 
         It 'sends a Bearer JWT in the Authorization header' {
-            Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+            Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             Should -Invoke Invoke-RestMethod -ParameterFilter {
                 $Headers.Authorization -match '^Bearer .+\..+\..+$'
             }
         }
 
         It 'sends the correct GitHub API version header' {
-            Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+            Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             Should -Invoke Invoke-RestMethod -ParameterFilter {
                 $Headers['X-GitHub-Api-Version'] -eq '2022-11-28'
             }
         }
 
         It 'returns the token from the API response' {
-            $result = Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+            $result = Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             $result | Should -Be 'ghs_faketoken123'
         }
 
         It 'throws when the API response has no token' {
             Mock Invoke-RestMethod { [pscustomobject]@{ token = $null } }
             {
-                Get-GitHubAppInstallationToken -AppId 'app1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
+                Get-GitHubAppInstallationToken -AppId 'app1' -ClientId 'client1' -InstallationId '99' -PrivateKeyPem $script:TestPrivateKeyPem
             } | Should -Throw 'GitHub API did not return an access token.'
         }
     }

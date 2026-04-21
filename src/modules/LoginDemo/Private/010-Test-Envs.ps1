@@ -29,6 +29,9 @@ function Test-Envs {
         $GhInstallId = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_installation_id')
         If (-not $GhInstallId) { Throw 'Required environment variable DEMOS_my_gh_app_installation_id is not set.' }
         If ($GhInstallId -notmatch '\A\d+\z') { Throw "DEMOS_my_gh_app_installation_id must be numeric. Got: '$GhInstallId'" }
+        # Validate DEMOS_my_gh_app_client_id environment variable
+        $GhClientId = [Environment]::GetEnvironmentVariable('DEMOS_my_gh_app_client_id')
+        If (-not $GhClientId) { Throw 'Required environment variable DEMOS_my_gh_app_client_id is not set.' }
     } # end BEGIN
 
     Process {} # end PROCESS
