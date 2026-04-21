@@ -1,7 +1,7 @@
 # Module must be loaded at script scope so it exists during Pester's discovery phase,
 # which is when InModuleScope is evaluated (before BeforeAll ever runs).
 # Dependencies are dot-sourced in the same order ModuleBuilder uses: alphabetical,
-# so ConvertTo-Base64Url (C) is defined before New-GitHubAppJwt (N).
+# so ConvertTo-Base64Url (020) is defined before New-GitHubAppJwt (030).
 Remove-Module -Name 'MyEphemeralModule' -Force -ErrorAction SilentlyContinue
 $script:base64UrlPath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'Private', '020-ConvertTo-Base64Url.ps1'))
 $script:ephemeralModulePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'Private', '030-New-GitHubAppJwt.ps1'))
