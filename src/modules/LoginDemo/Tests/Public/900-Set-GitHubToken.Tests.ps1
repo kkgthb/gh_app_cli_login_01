@@ -32,7 +32,7 @@ Describe "Testing script internals -- it should write host as expected" {
             # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_pem', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_pem', 'User'), 'Process')
             # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_id', 'User'), 'Process')
             # [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', [Environment]::SetEnvironmentVariable('DEMOS_my_gh_app_installation_id', 'User'), 'Process')
-            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } }
+            Mock Invoke-RestMethod { [pscustomobject]@{ token = 'ghs_faketoken123' } } # Note:  when I commented this mock out, Invoke-RestMethod got a 401 unauthorized error.  Bummer.
             Mock Write-Host {}
             Remove-Item Env:\TF_BUILD -ErrorAction 'Ignore'
         }
