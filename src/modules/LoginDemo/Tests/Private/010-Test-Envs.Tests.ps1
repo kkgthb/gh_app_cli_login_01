@@ -1,7 +1,7 @@
 # Module must be loaded at script scope so it exists during Pester's discovery phase,
 # which is when InModuleScope is evaluated (before BeforeAll ever runs).
 Remove-Module -Name 'MyEphemeralModule' -Force -ErrorAction SilentlyContinue
-$script:ephemeralModulePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'Private', 'Test-Envs.ps1'))
+$script:ephemeralModulePath = [System.IO.Path]::GetFullPath([System.IO.Path]::Combine($PSScriptRoot, '..', '..', 'Private', '010-Test-Envs.ps1'))
 Write-Host($script:ephemeralModulePath)
 $m = New-Module -Name 'MyEphemeralModule' -ArgumentList $script:ephemeralModulePath -ScriptBlock {
     param($modulePath)
